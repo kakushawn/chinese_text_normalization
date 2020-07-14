@@ -8,7 +8,12 @@
 #   - python 3.X
 # notes: python 2.X WILL fail or produce misleading results
 
-import sys, os, argparse, codecs, string, re
+import sys
+import os
+import argparse
+import codecs
+import string
+import re
 
 # ================================================================================ #
 #                                    basic constant
@@ -50,11 +55,14 @@ COM_QUANTIFIERS = '(匹|张|座|回|场|尾|条|个|首|阙|阵|网|炮|顶|丘|
 CHINESE_PUNC_STOP = '！？｡。'
 CHINESE_PUNC_NON_STOP = '＂＃＄％＆＇（）＊＋，－／：；＜＝＞＠［＼］＾＿｀｛｜｝～｟｠｢｣､、〃《》「」『』【】〔〕〖〗〘〙〚〛〜〝〞〟〰〾〿–—‘’‛“”„‟…‧﹏'
 CHINESE_PUNC_OTHER = '·〈〉-'
-CHINESE_PUNC_LIST = CHINESE_PUNC_STOP + CHINESE_PUNC_NON_STOP + CHINESE_PUNC_OTHER
+CHINESE_PUNC_LIST = CHINESE_PUNC_STOP + \
+    CHINESE_PUNC_NON_STOP + CHINESE_PUNC_OTHER
 
 # ================================================================================ #
 #                                    basic class
 # ================================================================================ #
+
+
 class ChineseChar(object):
     """
     中文字符
@@ -302,7 +310,7 @@ def chn2num(chinese_string, numbering_type=NUMBERING_TYPES[1]):
                 value[-1] *= pow(10, s.power)
                 if s.power > last_power:
                     value[:-1] = list(map(lambda v: v *
-                                                    pow(10, s.power), value[:-1]))
+                                          pow(10, s.power), value[:-1]))
                     last_power = s.power
                 value.append(0)
         return sum(value)
@@ -433,6 +441,7 @@ class Cardinal:
 
     def cardinal2chntext(self):
         return num2chn(self.cardinal)
+
 
 class Digit:
     """
@@ -578,7 +587,8 @@ class Money:
         matchers = pattern.findall(money)
         if matchers:
             for matcher in matchers:
-                money = money.replace(matcher[0], Cardinal(cardinal=matcher[0]).cardinal2chntext())
+                money = money.replace(matcher[0], Cardinal(
+                    cardinal=matcher[0]).cardinal2chntext())
         self.chntext = money
         return self.chntext
 
@@ -622,20 +632,24 @@ class NSWNormalizer:
         text = self.raw_text
 
         # 规范化日期
-        pattern = re.compile(r"\D+((([089]\d|(19|20)\d{2})年)?(\d{1,2}月(\d{1,2}[日号])?)?)")
+        pattern = re.compile(
+            r"\D+((([089]\d|(19|20)\d{2})年)?(\d{1,2}月(\d{1,2}[日号])?)?)")
         matchers = pattern.findall(text)
         if matchers:
-            #print('date')
+            # print('date')
             for matcher in matchers:
-                text = text.replace(matcher[0], Date(date=matcher[0]).date2chntext(), 1)
+                text = text.replace(matcher[0], Date(
+                    date=matcher[0]).date2chntext(), 1)
 
         # 规范化金钱
-        pattern = re.compile(r"\D+((\d+(\.\d+)?)[多余几]?" + CURRENCY_UNITS + r"(\d" + CURRENCY_UNITS + r"?)?)")
+        pattern = re.compile(
+            r"\D+((\d+(\.\d+)?)[多余几]?" + CURRENCY_UNITS + r"(\d" + CURRENCY_UNITS + r"?)?)")
         matchers = pattern.findall(text)
         if matchers:
-            #print('money')
+            # print('money')
             for matcher in matchers:
-                text = text.replace(matcher[0], Money(money=matcher[0]).money2chntext(), 1)
+                text = text.replace(matcher[0], Money(
+                    money=matcher[0]).money2chntext(), 1)
 
         # 规范化固话/手机号码
         # 手机
@@ -643,60 +657,68 @@ class NSWNormalizer:
         # 移动：139、138、137、136、135、134、159、158、157、150、151、152、188、187、182、183、184、178、198
         # 联通：130、131、132、156、155、186、185、176
         # 电信：133、153、189、180、181、177
-        pattern = re.compile(r"\D((\+?86 ?)?1([38]\d|5[0-35-9]|7[678]|9[89])\d{8})\D")
+        pattern = re.compile(
+            r"\D((\+?86 ?)?1([38]\d|5[0-35-9]|7[678]|9[89])\d{8})\D")
         matchers = pattern.findall(text)
         if matchers:
-            #print('telephone')
+            # print('telephone')
             for matcher in matchers:
-                text = text.replace(matcher[0], TelePhone(telephone=matcher[0]).telephone2chntext(), 1)
+                text = text.replace(matcher[0], TelePhone(
+                    telephone=matcher[0]).telephone2chntext(), 1)
         # 固话
         pattern = re.compile(r"\D((0(10|2[1-3]|[3-9]\d{2})-?)?[1-9]\d{6,7})\D")
         matchers = pattern.findall(text)
         if matchers:
             # print('fixed telephone')
             for matcher in matchers:
-                text = text.replace(matcher[0], TelePhone(telephone=matcher[0]).telephone2chntext(fixed=True), 1)
+                text = text.replace(matcher[0], TelePhone(
+                    telephone=matcher[0]).telephone2chntext(fixed=True), 1)
 
         # 规范化分数
         pattern = re.compile(r"(\d+/\d+)")
         matchers = pattern.findall(text)
         if matchers:
-            #print('fraction')
+            # print('fraction')
             for matcher in matchers:
-                text = text.replace(matcher, Fraction(fraction=matcher).fraction2chntext(), 1)
+                text = text.replace(matcher, Fraction(
+                    fraction=matcher).fraction2chntext(), 1)
 
         # 规范化百分数
         text = text.replace('％', '%')
         pattern = re.compile(r"(\d+(\.\d+)?%)")
         matchers = pattern.findall(text)
         if matchers:
-            #print('percentage')
+            # print('percentage')
             for matcher in matchers:
-                text = text.replace(matcher[0], Percentage(percentage=matcher[0]).percentage2chntext(), 1)
+                text = text.replace(matcher[0], Percentage(
+                    percentage=matcher[0]).percentage2chntext(), 1)
 
         # 规范化纯数+量词
         pattern = re.compile(r"(\d+(\.\d+)?)[多余几]?" + COM_QUANTIFIERS)
         matchers = pattern.findall(text)
         if matchers:
-            #print('cardinal+quantifier')
+            # print('cardinal+quantifier')
             for matcher in matchers:
-                text = text.replace(matcher[0], Cardinal(cardinal=matcher[0]).cardinal2chntext(), 1)
+                text = text.replace(matcher[0], Cardinal(
+                    cardinal=matcher[0]).cardinal2chntext(), 1)
 
         # 规范化数字编号
         pattern = re.compile(r"(\d{4,32})")
         matchers = pattern.findall(text)
         if matchers:
-            #print('digit')
+            # print('digit')
             for matcher in matchers:
-                text = text.replace(matcher, Digit(digit=matcher).digit2chntext(), 1)
+                text = text.replace(matcher, Digit(
+                    digit=matcher).digit2chntext(), 1)
 
         # 规范化纯数
         pattern = re.compile(r"(\d+(\.\d+)?)")
         matchers = pattern.findall(text)
         if matchers:
-            #print('cardinal')
+            # print('cardinal')
             for matcher in matchers:
-                text = text.replace(matcher[0], Cardinal(cardinal=matcher[0]).cardinal2chntext(), 1)
+                text = text.replace(matcher[0], Cardinal(
+                    cardinal=matcher[0]).cardinal2chntext(), 1)
 
         self.norm_text = text
         self._particular()
@@ -729,15 +751,21 @@ def nsw_test():
 
 
 if __name__ == '__main__':
-    #nsw_test()
+    # nsw_test()
 
     p = argparse.ArgumentParser()
     p.add_argument('ifile', help='input filename, assume utf-8 encoding')
     p.add_argument('ofile', help='output filename')
-    p.add_argument('--to_upper', action='store_true', help='convert to upper case')
-    p.add_argument('--to_lower', action='store_true', help='convert to lower case')
-    p.add_argument('--has_key', action='store_true', help="input text has Kaldi's key as first field.")
-    p.add_argument('--log_interval', type=int, default=100000, help='log interval in number of processed lines')
+    p.add_argument('--to_upper', action='store_true',
+                   help='convert to upper case')
+    p.add_argument('--to_lower', action='store_true',
+                   help='convert to lower case')
+    p.add_argument('--has_key', action='store_true',
+                   help="input text has Kaldi's key as first field.")
+    p.add_argument('--log_interval', type=int, default=100000,
+                   help='log interval in number of processed lines')
+    p.add_argument('--remove_punc', type=bool, default=False,
+                   help='remove punctuations')
     args = p.parse_args()
 
     ifile = codecs.open(args.ifile, 'r', 'utf8')
@@ -770,16 +798,19 @@ if __name__ == '__main__':
         text = NSWNormalizer(text).normalize()
 
         # Punctuations removal
-        old_chars = CHINESE_PUNC_LIST + string.punctuation # includes all CN and EN punctuations
-        new_chars = ' ' * len(old_chars)
-        del_chars = ''
-        text = text.translate(str.maketrans(old_chars, new_chars, del_chars))
+        if args.remove_punc:
+            # includes all CN and EN punctuations
+            old_chars = CHINESE_PUNC_LIST + string.punctuation
+            new_chars = ' ' * len(old_chars)
+            del_chars = ''
+            text = text.translate(str.maketrans(
+                old_chars, new_chars, del_chars))
 
         #
         if args.has_key:
             ofile.write(key + '\t' + text + '\n')
         else:
-            if text.strip() != '': # skip empty line in pure text format(without Kaldi's utt key)
+            if text.strip() != '':  # skip empty line in pure text format(without Kaldi's utt key)
                 ofile.write(text + '\n')
 
         n += 1
