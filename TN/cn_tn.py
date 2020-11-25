@@ -53,7 +53,7 @@ COM_QUANTIFIERS = '(匹|张|座|回|场|尾|条|个|首|阙|阵|网|炮|顶|丘|
 
 # punctuation information are based on Zhon project (https://github.com/tsroten/zhon.git)
 CHINESE_PUNC_STOP = '！？｡。'
-CHINESE_PUNC_NON_STOP = '＂＃＄％＆＇（）＊＋，－／：；＜＝＞＠［＼］＾＿｀｛｜｝～｟｠｢｣､、〃《》「」『』【】〔〕〖〗〘〙〚〛〜〝〞〟〰〾〿–—‘’‛“”„‟…‧﹏'
+CHINESE_PUNC_NON_STOP = '．＂＃＄％＆＇（）＊＋，－／：；＜＝＞＠［＼］＾＿｀｛｜｝～｟｠｢｣､、〃《》「」『』【】〔〕〖〗〘〙〚〛〜〝〞〟〰〾〿–—‘’‛“”„‟…‧﹏'
 CHINESE_PUNC_OTHER = '·〈〉-'
 CHINESE_PUNC_LIST = CHINESE_PUNC_STOP + \
     CHINESE_PUNC_NON_STOP + CHINESE_PUNC_OTHER
@@ -808,7 +808,7 @@ if __name__ == '__main__':
 
         #
         if args.has_key:
-            ofile.write(key + '\t' + text + '\n')
+            ofile.write(key + ' ' + text + '\n')
         else:
             if text.strip() != '':  # skip empty line in pure text format(without Kaldi's utt key)
                 ofile.write(text + '\n')
